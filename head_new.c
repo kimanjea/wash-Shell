@@ -13,9 +13,11 @@ void print_usage() {
 }
 
 int main(int argc, char *argv[]) {
+
     int num_lines = DEFAULT_LINES; // Default number of lines
     char *filename = NULL;
     FILE *file = stdin;
+
 
     // Parse arguments
     for (int i = 1; i < argc; i++) {
@@ -38,7 +40,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // Open file if provided
+    // Open file when provided
     if (filename != NULL) {
         file = fopen(filename, "r");
         if (file == NULL) {
