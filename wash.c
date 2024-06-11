@@ -5,22 +5,19 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <fcntl.h>
-#include <string.h>
-
+#include <ctype.h>
 
 #define MAX_LINE 256
-
-
+#define MAX_ARGS 100
 
 void parse_input(char *input, char **args, int *background) {
     *background = 0;
 
     // Trim leading and trailing whitespace
-    char *end;
     while (isspace((unsigned char)*input)) input++;
     if (*input == 0) return; // All spaces
 
-    end = input + strlen(input) - 1;
+    char *end = input + strlen(input) - 1;
     while (end > input && isspace((unsigned char)*end)) end--;
     end[1] = '\0';
 
@@ -62,7 +59,7 @@ void execute_command(char **args) {
 
 int main() {
     char input[MAX_LINE];
-    char *args[MAX_LINE/2 + 1];
+    char *args[MAX_ARGS];
     int background;
 
     while (1) {
@@ -103,9 +100,26 @@ int main() {
                 perror("cd");
             }
         } else if (strcmp(args[0], "setpath") == 0) {
-            // Implementation of setpath (not included in this snippet)
+            if (args[1] == NULL) {
+                fprintf(stderr, "setpath: missing argument\n");
+            } else {
+                char path[MAX_LINE] = "";
+                for (int i = 1; args[i] != NULL; i++) {
+                    strcat(path, args[i]);
+                    if (args[i + 1] != NULL) {
+                        strcat(path, ":");
+                    }
+                }
+                setenv("PATH", path, 1);
+            }
         } else if (strcmp(args[0], "help") == 0) {
-            // Implementation of help (not included in this snippet)
+            printf("Built-in commands:\n");
+            printf("exit: Exit the shell\n");
+            printf("echo [text]: Print the provided text\n");
+            printf("pwd: Print the current working directory\n");
+            printf("cd [dir]: Change the current directory\n");
+            printf("setpath <dir> [dir ...]: Set the PATH for executable programs\n");
+            printf("help: List all built-in commands\n");
         } else {
             execute_command(args);
         }

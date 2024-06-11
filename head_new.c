@@ -2,12 +2,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define DEFAULT_LINES 7
+#define MAX_LINE_LENGTH 256
+
 void print_usage() {
     printf("Usage: head_new [-h] [-n N] [file.txt]\n");
+    printf("Options:\n");
+    printf("  -h        Display this help message and exit\n");
+    printf("  -n N      Print the first N lines (default is 7 lines)\n");
 }
 
 int main(int argc, char *argv[]) {
-    int num_lines = 7; // Default number of lines
+    int num_lines = DEFAULT_LINES; // Default number of lines
     char *filename = NULL;
     FILE *file = stdin;
 
@@ -19,6 +25,10 @@ int main(int argc, char *argv[]) {
         } else if (strcmp(argv[i], "-n") == 0) {
             if (i + 1 < argc) {
                 num_lines = atoi(argv[++i]);
+                if (num_lines <= 0) {
+                    fprintf(stderr, "Error: Number of lines must be a positive integer.\n");
+                    return 1;
+                }
             } else {
                 fprintf(stderr, "Error: -n requires a number\n");
                 return 1;
@@ -38,7 +48,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Read and print lines
-    char line[256];
+    char line[MAX_LINE_LENGTH];
     for (int i = 0; i < num_lines && fgets(line, sizeof(line), file); i++) {
         printf("%s", line);
     }
