@@ -1,17 +1,17 @@
-#include <stdio.h>
+#include <stdio.h> // Standard I/O functions
 #include <stdlib.h>
-#include <unistd.h>
+#include <unistd.h> // POSIX operating system API
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <fcntl.h>
-#include <ctype.h>
+#include <ctype.h>  // Character type functions
 
 #define MAX_LINE 256
 #define MAX_ARGS 100
 
 void parse_input(char *input, char **args, int *background) {
-    *background = 0;
+    *background = 0;  // Initializes the background flag to 0 (false).
 
     // Trim leading and trailing whitespace
     while (isspace((unsigned char)*input)) input++;
@@ -45,27 +45,29 @@ void execute_command(char **args) {
         perror("fork");
         return;
     } else if (pid == 0) {
-        // Child process
+        // Child process Executes the command using execvp. If execvp fails, prints an error message and exits.
         if (execvp(args[0], args) == -1) {
             perror("execvp");
         }
         exit(EXIT_FAILURE);
     } else {
-        // Parent process
+        // Parent process Waits for the child process to complete using waitpid
         int status;
         waitpid(pid, &status, 0);
     }
 }
 
 int main() {
-    char input[MAX_LINE];
-    char *args[MAX_ARGS];
-    int background;
+    char input[MAX_LINE]; //Buffer to store user input.
 
-    while (1) {
+    char *args[MAX_ARGS]; //Array of strings to store command arguments.
+
+    int background; //Flag to indicate if the command should run in the background.
+
+    while (1) { //main loop
         printf("wash> ");
         if (fgets(input, MAX_LINE, stdin) == NULL) {
-            // Handle end of input (Ctrl+D)
+            // Handle end of input 
             printf("\n");
             break;
         }
@@ -76,15 +78,21 @@ int main() {
         parse_input(input, args, &background);
 
         // Check for built-in commands and handle them
-        if (args[0] == NULL) continue; // Empty input
+        if (args[0] == NULL) {
+            continue;
+        }
 
         if (strcmp(args[0], "exit") == 0) {
             break;
+
+
         } else if (strcmp(args[0], "echo") == 0) {
             for (int i = 1; args[i] != NULL; i++) {
                 printf("%s ", args[i]);
             }
             printf("\n");
+
+
         } else if (strcmp(args[0], "pwd") == 0) {
             char cwd[MAX_LINE];
             if (getcwd(cwd, sizeof(cwd)) != NULL) {
@@ -92,6 +100,8 @@ int main() {
             } else {
                 perror("getcwd");
             }
+
+
         } else if (strcmp(args[0], "cd") == 0) {
             if (args[1] == NULL) {
                 args[1] = getenv("HOME");

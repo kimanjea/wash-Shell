@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <stdio.h> //input and output
 #include <stdlib.h>
 #include <string.h>
 
